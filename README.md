@@ -53,8 +53,3 @@ bun run preview  # serve the production build
 
 React 19, TypeScript, Vite, Tailwind CSS 4 and [star-dust](https://github.com/nuwanchamp/star-dust).
 The particles are drawn with WebGL.
-
-## Credits
-
-- The mail icon is from [Lucide](https://lucide.dev) (ISC licence).
-- The other icons and images belong to the site owner.
