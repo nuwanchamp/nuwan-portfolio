@@ -8,6 +8,12 @@ import { parseLayoutMarkup, type LayoutNode } from '@encenlab/star-dust/core';
 //   scatter     → blow the current scene apart (it re-forms)
 // TODO: replace the placeholder copy with your own.
 const MARKUP = {
+  // Intro: the logo forms first, then morphs into 'home' (timing in App.tsx INTRO).
+  logo: `<Col gap="36" align="center" justify="center">
+  <Image src="/logo.png" width="300" label="Nuwan C. Perera logo" />
+  <Text size="sm" font="mono">LOADING ...</Text>
+</Col>`,
+
   home: `<Row gap="34" align="center" justify="center">
 <Image src="/nuwan.jpeg" width="260" height="260" blur="0" blurStyle="radial" />
 <Col gap="18" align="start">
@@ -317,6 +323,7 @@ function parse(id: SceneId): LayoutNode | null {
 }
 
 export const SCENES: Record<SceneId, LayoutNode | null> = {
+  logo: parse('logo'),
   home: parse('home'),
   bio: parse('bio'),
   mindmap: parse('mindmap'),

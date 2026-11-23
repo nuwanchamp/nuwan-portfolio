@@ -1,10 +1,25 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DEFAULT_IMAGE_TUNING } from '@encenlab/star-dust';
 import { DustCanvas } from '@encenlab/star-dust/react';
 import { SCENES, isSceneId, type SceneId } from './scenes';
 
-// Shown one after another, one per click. After the last one, the dust opens the 'home' layout.
-const MESSAGES = ['Hello!', 'I am Nuwan.'];
+// The intro plays by itself on first load: the wave pours into the first step, each step holds for
+// `ms` (forming included) and then morphs into the next; after the last one it morphs into 'home'.
+// A step is a layout scene (e.g. the logo) or a line of text. A click skips to the next step.
+type IntroStep = { scene: SceneId; ms: number } | { text: string; ms: number };
+const INTRO: IntroStep[] = [
+  { scene: 'logo', ms: 7200 },
+  // { text: 'Welcome', ms: 3400 },
+];
+// How long the opening wave drifts before the first step gathers out of it (long enough to be seen).
+const INTRO_START_MS = 2200;
+// Whenever the dust takes a new shape (wave → logo, logo → home, scene buttons), the old shape melts
+// into the Perlin wind and the streams condense into the new one over about this long (star-dust
+// formFlowMs, 0.7+).
+const FORM_FLOW_MS = 2200;
+// Spring that pulls each mote to its place (star-dust default 0.065). Lower = slower, gentler
+// gathering; roughly halves the travel speed. Much below ~0.02 shapes stay soft for a long time.
+const COHESION = 0.03;
 // Seconds without interaction before formed text melts back into the wave.
 const IDLE_DISSOLVE_SEC = 12;
 // Layout scenes take ~10–25s to settle (longer with images), so give them more time to be read.
@@ -18,25 +33,50 @@ const IMAGE_TUNING = { ...DEFAULT_IMAGE_TUNING, edgeBlur: 0 };
 
 type Stage =
   | { kind: 'wave' }
-  | { kind: 'text'; index: number }
+  | { kind: 'intro'; index: number }
   | { kind: 'layout'; scene: SceneId };
 
 export default function App() {
   const [stage, setStage] = useState<Stage>({ kind: 'wave' });
-  // Last text shown; kept as the target while in other stages so it doesn't re-sample needlessly.
   const [scatterVersion, setScatterVersion] = useState(0);
+  // After the intro has played once, tapping the wave goes straight to home.
+  const introDone = useRef(false);
+
+  const nextIntroStep = useCallback((index: number) => {
+    if (index < INTRO.length) {
+      setStage({ kind: 'intro', index });
+    } else {
+      introDone.current = true;
+      setStage({ kind: 'layout', scene: 'home' });
+    }
+  }, []);
+
+  // Start the intro after the opening wave has drifted for a moment.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (!introDone.current) nextIntroStep(0);
+    }, INTRO_START_MS);
+    return () => clearTimeout(t);
+  }, [nextIntroStep]);
+
+  // Each intro step holds for its time, then morphs into the next.
+  useEffect(() => {
+    if (stage.kind !== 'intro') return;
+    const t = setTimeout(() => nextIntroStep(stage.index + 1), INTRO[stage.index].ms);
+    return () => clearTimeout(t);
+  }, [stage, nextIntroStep]);
 
   const toWave = useCallback(() => {
     setScatterVersion((v) => v + 1);
     setStage({ kind: 'wave' });
   }, []);
 
-  // Plain canvas clicks step through the messages. Layout scenes are driven by their buttons instead.
+  // Plain canvas clicks skip ahead in the intro. Layout scenes are driven by their buttons instead.
   const handleCanvasClick = useCallback(() => {
     if (stage.kind === 'layout') return;
-    const next = 0;
-    setStage({ kind: 'layout', scene: 'home' });
-  }, [stage]);
+    if (stage.kind === 'intro') return nextIntroStep(stage.index + 1);
+    nextIntroStep(introDone.current ? INTRO.length : 0);
+  }, [stage, nextIntroStep]);
 
   const handleLayoutAction = useCallback(
     (action: string) => {
@@ -61,15 +101,23 @@ export default function App() {
   // The engine dissolved idle text into the wave by itself; restart the sequence.
   const handleAutoDissolvedToWave = useCallback(() => setStage({ kind: 'wave' }), []);
 
-  const isLayout = stage.kind === 'layout';
+  const introStep = stage.kind === 'intro' ? INTRO[stage.index] : null;
+  // Which layout scene is showing, if any: a normal scene, or an intro step that is a scene.
+  const layoutScene: SceneId | null =
+    stage.kind === 'layout' ? stage.scene : introStep && 'scene' in introStep ? introStep.scene : null;
+  const isLayout = layoutScene !== null;
+  // The text target only matters for intro text steps; elsewhere keep the last one so it isn't re-sampled.
+  const lastIntroText = useRef('');
+  if (introStep && 'text' in introStep) lastIntroText.current = introStep.text;
 
   return (
     <main className="relative h-full w-full overflow-hidden">
       <DustCanvas
         targetMode={isLayout ? 'layout' : 'text'}
-        activeText={""}
-        layoutAst={isLayout ? SCENES[stage.scene] : null}
+        activeText={lastIntroText.current}
+        layoutAst={layoutScene ? SCENES[layoutScene] : null}
         isFreeDrift={stage.kind === 'wave'}
+        formFlowMs={FORM_FLOW_MS}
         scatterVersion={scatterVersion}
         palette="aurora"
         imageTuning={IMAGE_TUNING}
@@ -78,6 +126,7 @@ export default function App() {
           cursorMode: 'off',
           bloom: false,
           perlinFlow: true,
+          cohesion: COHESION,
           autoDissolveSec: isLayout ? LAYOUT_DISSOLVE_SEC : IDLE_DISSOLVE_SEC,
         }}
         onCanvasClick={handleCanvasClick}
@@ -97,9 +146,11 @@ export default function App() {
       />
       <p className="pointer-events-none absolute inset-x-0 bottom-8 text-center text-sm tracking-widest text-gray-400">
         {stage.kind === 'wave'
-          ? 'tap the dust'
-          : stage.kind === 'text'
-            ? 'tap to continue'
+          ? introDone.current
+            ? 'tap the dust'
+            : ''
+          : stage.kind === 'intro'
+            ? 'tap to skip'
             : 'tap a button'}
       </p>
     </main>
