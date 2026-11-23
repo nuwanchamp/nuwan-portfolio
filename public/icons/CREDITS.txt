@@ -1,0 +1,1 @@
+Icons: linkedin.png, github.png, whatsapp.png supplied by the site owner (recoloured white). mail.svg from Lucide (ISC, (c) Lucide Icons and Contributors).
