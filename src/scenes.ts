@@ -17,7 +17,7 @@ const MARKUP = {
   home: `<Row gap="34" align="center" justify="center">
 <Image src="/nuwan.jpeg" width="260" height="260" blur="0" blurStyle="radial" />
 <Col gap="18" align="start">
-  <Heading size="xl">Hi! I'm Nuwan.</Heading>
+  <Heading size="xl" density="dense">Hi! I'm Nuwan.</Heading>
   <Text width="420">
     I'm a software engineer and web developer with a passion for creating interactive experiences. I specialize in building responsive and user friendly web applications using modern technologies.
   </Text>
@@ -35,14 +35,14 @@ const MARKUP = {
     <Image src="/icons/linkedin.png" width="16" height="16" label="LinkedIn" action="open:https://linkedin.com/in/nuwan-c-perera" />
     <Image src="/icons/github.png" width="16" height="16" label="GitHub" action="open:https://github.com/nuwanchamp" />
     <Image src="/icons/whatsapp.png" width="16" height="16" label="WhatsApp +971 52 261 8842" action="open:https://wa.me/971522618842" />
-    <Image src="/icons/mail.svg" width="16" height="16" label="Email nuwanchamp02@gmail.com" action="open:mailto:nuwanchamp02@gmail.com" />
+    <Image src="/icons/mail.svg" width="16" height="16" label="Email nuwanchamp02@gmail.com" action="open:mailto:enuwan.perera@gmail.com" />
   </Row>
 </Col></Row>`,
 
   // Full profile from the OKF bundle + generic resume (contact details and references left out).
-  bio: `<Col gap="16" align="left">
-  <Heading size="lg">Nuwan C. Perera</Heading>
-  <Text>Senior Software Engineer | UAE, Sharjah</Text>
+  bio: `<Col gap="16" align="left" density="sparse">
+  <Heading size="lg" density="dense">Nuwan C. Perera</Heading>
+  <Text>Senior Software Engineer | Sri Lanka</Text>
   <Quote width="820">
     Senior Software Engineer with 10+ years of experience building backend systems, APIs, and modern web applications with PHP (Symfony, Laravel), Python, React, and Vue.js. Strong track record leading project delivery, mentoring engineers, and driving measurable outcomes and productivity gain through better tooling and process. Comfortable working across the stack, from microservice architecture and CI/CD pipelines to production facing dashboards, with a consistent focus on modular design, testing discipline (TDD), and clean, maintainable code.
   </Quote>
@@ -147,7 +147,7 @@ const MARKUP = {
   // Tree layout: area → group → details. Branches with collapsed="true" start folded and open on
   // click; star-dust (0.3.0+) handles that and folds/pages anything that doesn't fit the screen.
   mindmap: `<Col gap="14" align="center">
-  <MindMap id="okf" title="Nuwan C. Perera" layout="tree" ripple="pulse">
+  <MindMap id="okf" title="Nuwan C. Perera" layout="tree" ripple="off" density="densed" >
     <Branch label="Experience · 10+ yrs">
       <Branch label="Strategic Partnership Solutions · 2026" collapsed="true">
         <Branch label="Senior Software Engineer" />
@@ -301,16 +301,62 @@ const MARKUP = {
       <Branch label="Toastmasters · 2024" />
     </Branch>
   </MindMap>
+  <Spacer size="36" />
   <Row gap="16">
     <Button action="scene:home" variant="solid">Back</Button>
     <Button action="scene:bio">Full Profile</Button>
   </Row>
 </Col>`,
-  projects: `<Col gap="14" align="center">
-  <Heading size="lg">Projects</Heading>
-  <List width="820">
-    - <Text>GitHub</Text>
-  </List>
+  // Case studies from github.com/nuwanchamp/blueprints (published ones only; each links to its write-up).
+  projects: `<Col gap="18" align="left" density="balanced">
+  <Heading size="lg" density="balanced">Projects</Heading>
+  <Text width="760">Case studies from my blueprints repo: the problem, what I built, the decisions behind it, and what changed.</Text>
+  <Divider length="220" />
+
+  <Col gap="6" align="start">
+    <Heading size="md">Plugin Framework Architecture</Heading>
+    <Text size="sm" font="mono" width="760">Senior Software Engineer · Enterprise monitoring platform · 2025 - 2026</Text>
+    <Text width="760">An event-driven plugin and micro-frontend framework that moved scattered plugin code (iframes, host processes, flags in the core) out of a Symfony 5 platform into independently owned modules.</Text>
+    <List width="760">
+      - Release cycles more than 40% faster
+      - 10+ features centralized under one extensible framework
+      - Less regression risk: plugin logic out of the core code paths
+    </List>
+    <Text size="sm" font="mono" width="760">PHP · Symfony 5 · React · TypeScript · Micro frontends · Event-driven</Text>
+    <Button action="open:https://github.com/nuwanchamp/blueprints/tree/main/case-studies/01-plugin-framework-architecture" size="sm">Read case study</Button>
+  </Col>
+
+  <Col gap="6" align="start">
+    <Heading size="md">Kids' ICT Game: Mouse &amp; Keyboard Skills</Heading>
+    <Text size="sm" font="mono" width="760">Developer &amp; designer · Rainbow Roots Academy · 2026</Text>
+    <Text width="760">A Godot 4 game that teaches children with special educational needs in Sri Lanka to use a mouse and keyboard: no fail states, audio-first narration, and content a teacher can retune without a rebuild.</Text>
+    <List width="760">
+      - 20 levels in two units, plus two replayable practice modes
+      - In active use by 5 - 7 students
+      - Curriculum-aligned to Grade 2 ICT outcomes
+    </List>
+    <Text size="sm" font="mono" width="760">Godot 4 · GDScript · Shaders · Procedural audio · Windows build</Text>
+    <Button action="open:https://github.com/nuwanchamp/blueprints/tree/main/case-studies/03-kids-ict-game-adaptive-pedagogy" size="sm">Read case study</Button>
+  </Col>
+
+  <Col gap="6" align="start">
+    <Heading size="md">Offline-First Desktop Accounting</Heading>
+    <Text size="sm" font="mono" width="760">Sole developer · Restaurant client · 2026</Text>
+    <Text width="760">A bilingual (EN / 简体中文) desktop app for a restaurant's daily close, expenses and cash reconciliation, designed from watching the manual process. Runs fully offline on one SQLite file, backs itself up, and updates only with a manager's PIN.</Text>
+    <List width="760">
+      - Profit and loss with expense drill-down, for the first time in one place
+      - 50 unit, 88 browser and 8 Electron end-to-end tests
+      - Windows installer and Linux AppImage built in CI from a version tag
+    </List>
+    <Text size="sm" font="mono" width="760">TypeScript · React · Electron · SQLite · Vite · Playwright · GitHub Actions</Text>
+    <Button action="open:https://github.com/nuwanchamp/blueprints/tree/main/case-studies/05-offline-first-desktop-accounting" size="sm">Read case study</Button>
+  </Col>
+
+  <Divider length="220" />
+  <Row gap="18" align="center" wrap="true">
+    <Button action="scene:home" variant="solid">Back</Button>
+    <Button action="open:https://github.com/nuwanchamp/blueprints">All case studies</Button>
+  </Row>
 </Col>`,
 } as const;
 
