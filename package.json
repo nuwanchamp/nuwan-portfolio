@@ -10,7 +10,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@encenlab/star-dust": "github:nuwanchamp/star-dust#v0.7.2",
+    "@encenlab/star-dust": "github:nuwanchamp/star-dust#v0.7.3",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
